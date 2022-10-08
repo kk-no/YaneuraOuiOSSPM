@@ -2,14 +2,18 @@
 
 やねうら王をiOS向けのSwift Package Managerパッケージとしてビルドするスクリプト。
 
-試作版。駒得評価のみ。
+試作版。水匠埋め込み試作中。
 
 # ビルド
 
 Xcode 16.0, cmake 3.24.1
 
 ```
+git submodule init
+git submodule update
 cd build
+curl --create-dirs -RLo .dl/suishopetite_20211123.k_p.nnue.cpp.gz https://github.com/mizar/YaneuraOu/releases/download/resource/suishopetite_20211123.k_p.nnue.cpp.gz
+gzip -cd .dl/suisho5_20211123.halfkp.nnue.cpp.gz > .dl/embedded_nnue.cpp
 ./build.bash
 ```
 

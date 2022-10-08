@@ -37,7 +37,20 @@ set (SRC
     ../../YaneuraOu/source/testcmd/normal_test_cmd.cpp
     ../../YaneuraOu/source/testcmd/benchmark.cpp
     ../../YaneuraOu/source/engine/yaneuraou-engine/yaneuraou-search.cpp
+# NNUE
+    ../../YaneuraOu/source/eval/nnue/evaluate_nnue.cpp
+    ../../YaneuraOu/source/eval/nnue/evaluate_nnue_learner.cpp
+    ../../YaneuraOu/source/eval/nnue/nnue_test_command.cpp
+    ../../YaneuraOu/source/eval/nnue/features/k.cpp
+    ../../YaneuraOu/source/eval/nnue/features/p.cpp
+    ../../YaneuraOu/source/eval/nnue/features/half_kp.cpp
+    ../../YaneuraOu/source/eval/nnue/features/half_kp_vm.cpp
+    ../../YaneuraOu/source/eval/nnue/features/half_relative_kp.cpp
+    ../../YaneuraOu/source/eval/nnue/features/half_kpe9.cpp
+    ../../YaneuraOu/source/eval/nnue/features/pe9.cpp
+    ../.dl/embedded_nnue.cpp
 )
 add_library(yaneuraou STATIC ${SRC})
 
-target_compile_options(yaneuraou PUBLIC -fno-exceptions -fno-rtti -Wextra -MMD -MP -fpermissive -Ofast -DNDEBUG -D_LINUX -DUNICODE -DNO_EXCEPTIONS -DMATERIAL_LEVEL=1 -DIS_64BIT -DUSE_NEON -DYANEURAOU_ENGINE_MATERIAL)
+# target_compile_options(yaneuraou PUBLIC -fno-exceptions -fno-rtti -Wextra -MMD -MP -fpermissive -Ofast -DNDEBUG -D_LINUX -DUNICODE -DNO_EXCEPTIONS -DMATERIAL_LEVEL=1 -DIS_64BIT -DUSE_NEON -DYANEURAOU_ENGINE_MATERIAL)
+target_compile_options(yaneuraou PUBLIC -fno-exceptions -fno-rtti -Wextra -MMD -MP -fpermissive -Ofast -DNDEBUG -D_LINUX -DUNICODE -DNO_EXCEPTIONS -DIS_64BIT -DUSE_NEON -DYANEURAOU_ENGINE_NNUE -DEVAL_NNUE_KP256 -DEVAL_EMBEDDING)
