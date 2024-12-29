@@ -13,25 +13,38 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <unistd.h>
+#include <cerrno>
 
 static int socket_fd;
 
 static int socket_connect(const char* server_ip, int server_port) {
     int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (socket_fd == -1) {
-        std::cerr << "Failed to create socket" << std::endl;
-        return false;
-    }
-    struct sockaddr_in sin;
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = inet_addr(server_ip);
-    sin.sin_port = htons(server_port);
-
-    int ret = connect(socket_fd, (const struct sockaddr*)&sin, sizeof(sin));
-    if (ret == -1) {
-        std::cerr << "Failed to connect tcp server" << std::endl;
+        std::cerr << "Failed to create socket: " << strerror(errno) << std::endl;
         return -1;
     }
+
+    struct sockaddr_in sin;
+    std::memset(&sin, 0, sizeof(sin));
+    sin.sin_family = AF_INET;
+    sin.sin_port = htons(server_port);
+
+    if (inet_pton(AF_INET, server_ip, &sin.sin_addr) <= 0) {
+        std::cerr << "Invalid IP address: " << server_ip << std::endl;
+        close(socket_fd);
+        return -1;
+    }
+
+    int ret = connect(socket_fd, (struct sockaddr*)&sin, sizeof(sin));
+    if (ret == -1) {
+        std::cerr << "Failed to connect to server (" << server_ip << ":" << server_port << "): " 
+                  << strerror(errno) << std::endl;
+        close(socket_fd);
+        return -1;
+    }
+
+    std::cout << "Successfully connected to server (" << server_ip << ":" << server_port << ")" << std::endl;
 
     return socket_fd;
 }
