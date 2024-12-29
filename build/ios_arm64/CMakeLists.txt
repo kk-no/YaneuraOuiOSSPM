@@ -53,4 +53,4 @@ set (SRC
 add_library(yaneuraou STATIC ${SRC})
 
 # target_compile_options(yaneuraou PUBLIC -fno-exceptions -fno-rtti -Wextra -MMD -MP -fpermissive -Ofast -DNDEBUG -D_LINUX -DUNICODE -DNO_EXCEPTIONS -DMATERIAL_LEVEL=1 -DIS_64BIT -DUSE_NEON -DYANEURAOU_ENGINE_MATERIAL)
-target_compile_options(yaneuraou PUBLIC -fno-exceptions -fno-rtti -Wextra -MMD -MP -fpermissive -Ofast -DNDEBUG -D_LINUX -DUNICODE -DNO_EXCEPTIONS -DIS_64BIT -DUSE_NEON -DYANEURAOU_ENGINE_NNUE -DEVAL_NNUE_KP256 -DEVAL_EMBEDDING)
+target_compile_options(yaneuraou PUBLIC -fno-exceptions -fno-rtti -Wextra -MMD -MP -fpermissive -Ofast -DNDEBUG -D_LINUX -DUNICODE -DNO_EXCEPTIONS -DIS_64BIT -DUSE_NEON -DYANEURAOU_ENGINE_NNUE -DEVAL_EMBEDDING)
