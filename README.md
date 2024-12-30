@@ -8,14 +8,27 @@
 
 Xcode 16.0, cmake 3.24.1
 
+Suisho petit
 ```
 git submodule init
 git submodule update
 cd build
 curl --create-dirs -RLo .dl/suishopetite_20211123.k_p.nnue.cpp.gz https://github.com/mizar/YaneuraOu/releases/download/resource/suishopetite_20211123.k_p.nnue.cpp.gz
+gzip -cd .dl/suishopetite_20211123.k_p.nnue.cpp.gz > .dl/embedded_nnue.cpp
+./build.bash
+```
+
+Suisho5
+```
+git submodule init
+git submodule update
+cd build
+curl --create-dirs -RLo .dl/suisho5_20211123.halfkp.nnue.cpp.gz https://github.com/mizar/YaneuraOu/releases/download/resource/suisho5_20211123.halfkp.nnue.cpp.gz
 gzip -cd .dl/suisho5_20211123.halfkp.nnue.cpp.gz > .dl/embedded_nnue.cpp
 ./build.bash
 ```
+
+`CmakeLists.txt`(アーキテクチャ別に2個ある)の`target_compile_options`の中の`-DEVAL_NNUE_KP256`を削除。
 
 # インターフェース変更
 
@@ -24,20 +37,6 @@ gzip -cd .dl/suisho5_20211123.halfkp.nnue.cpp.gz > .dl/embedded_nnue.cpp
 関数シグネチャは `build/include/yaneuraou.h`及び`Sources/YaneuraOuiOSSPM/include/yaneuraou.h`に同じ内容を記述する。
 
 ビルドするソースコードリスト、コンパイラオプションは `build/ios_{arm64,x86_64}/CMakeLists.txt` に記述する。(本当は１ファイルにまとめたいのだがcmakeの知識が足りないだけ)
-
-# 本家水匠5を埋め込む
-
-上記のビルド手段は`SuishoPetite`評価関数を埋め込む。本家水匠5を埋め込むことも可能。ただしビルド結果が100MBを超えるためGithubに上げることができない。
-
-curlコマンドを以下に変更。
-
-```
-curl --create-dirs -RLo .dl/suisho5_20211123.halfkp.nnue.cpp.gz https://github.com/mizar/YaneuraOu/releases/download/resource/suisho5_20211123.halfkp.nnue.cpp.gz
-```
-
-`CmakeLists.txt`(アーキテクチャ別に2個ある)の`target_compile_options`の中の`-DEVAL_NNUE_KP256`を削除。
-
-これで埋め込まれる評価関数が変わる。
 
 # git　タグ
 

@@ -6,83 +6,55 @@
 #include "../../YaneuraOu/source/tt.h"
 #include "../../YaneuraOu/source/usi.h"
 #include "../../YaneuraOu/source/misc.h"
+#include "../include/yaneuraou.h"
 
 // cin/coutをsocketにリダイレクト
 #include <iostream>
+#include <unistd.h>
 #include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 
-static int socket_fd;
-
-static int socket_connect(const char* server_ip, int server_port) {
-    int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (socket_fd == -1) {
-        std::cerr << "Failed to create socket" << std::endl;
-        return false;
-    }
-    struct sockaddr_in sin;
-    sin.sin_family = AF_INET;
-    sin.sin_addr.s_addr = inet_addr(server_ip);
-    sin.sin_port = htons(server_port);
-
-    int ret = connect(socket_fd, (const struct sockaddr*)&sin, sizeof(sin));
-    if (ret == -1) {
-        std::cerr << "Failed to connect tcp server" << std::endl;
-        return -1;
-    }
-
-    return socket_fd;
-}
+std::string nnue_file_path;
 
 class myoutstreambuf : public std::streambuf {
+private:
+	yaneuraou_usi_write_cb usi_write;
+
 public:
-    myoutstreambuf(int _socket_fd): socket_fd(_socket_fd) {
+    myoutstreambuf(yaneuraou_usi_write_cb _usi_write): usi_write(_usi_write) {
     }
 
 protected:
     int overflow(int nCh = EOF) {
-		if (nCh >= 0) {
-			char c = (char)nCh;
-			if (send(socket_fd, &c, 1, 0) < 1) {
-				return EOF;
-			}
-		}
+		usi_write(nCh);
         return nCh;
     }
-private:
-	int socket_fd;
 };
 
 class myinstreambuf : public std::streambuf {
+private:
+	yaneuraou_usi_read_cb usi_read;
+
 public:
-    myinstreambuf(int _socket_fd): socket_fd(_socket_fd) {
+    myinstreambuf(yaneuraou_usi_read_cb _usi_read): usi_read(_usi_read) {
     }
 
 protected:
     int uflow() {
-		char buf;
-		if (recv(socket_fd, &buf, 1, 0)) {
-			return buf;
-		} else {
-			return EOF;
-		}
+		return usi_read();
     }
 
-private:
-	int socket_fd;
 };
 
-static void yaneuraou_ios_thread_main() {
-	myoutstreambuf outs(socket_fd);
-	myinstreambuf ins(socket_fd);
+static void yaneuraou_ios_thread_main(yaneuraou_usi_read_cb usi_read, yaneuraou_usi_write_cb usi_write) {
+	myoutstreambuf outs(usi_write);
+	myinstreambuf ins(usi_read);
 	auto default_out = std::cout.rdbuf(&outs);
 	auto default_in = std::cin.rdbuf(&ins);
 
 	// --- 全体的な初期化
 	int argc = 1;
-	char *argv[] = {"yaneuraou"};
+	char argv0[] = "yaneuraou";
+	char *argv[] = {argv0};
 	CommandLine::init(argc,argv);
 	USI::init(Options);
 	Bitboards::init();
@@ -111,14 +83,13 @@ static void yaneuraou_ios_thread_main() {
 
 	std::cout.rdbuf(default_out);
 	std::cin.rdbuf(default_in);
+    
+	// maybe send disconnect message
 }
 
-extern "C" int yaneuraou_ios_main(const char* server_ip, int server_port) {
-	socket_fd = socket_connect(server_ip, server_port);
-	if (socket_fd < 0) {
-		return 1;
-	}
-    std::thread thread(yaneuraou_ios_thread_main);
+extern "C" int yaneuraou_ios_main(yaneuraou_usi_read_cb usi_read, yaneuraou_usi_write_cb usi_write, const char* nnue_file_path) {
+    ::nnue_file_path = nnue_file_path;
+	std::thread thread(yaneuraou_ios_thread_main, usi_read, usi_write);
     thread.detach();
     return 0;
 }
